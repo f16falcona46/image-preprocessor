@@ -69,7 +69,7 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 			SendMessage(g_hProgressBar, PBM_SETSTEP, (WPARAM)1, 0);
 
 			g_abortthreads = false;
-			handle = std::async(std::launch::async, start_threads, filenames, g_hProgressBar, hwnd, params);
+			handle = std::async(std::launch::async, ifx::start_threads, filenames, g_hProgressBar, hwnd, params);
 		}
 		break;
 		case WM_COMMAND:

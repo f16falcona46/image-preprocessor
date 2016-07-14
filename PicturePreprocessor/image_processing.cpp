@@ -13,13 +13,17 @@
 #include "microscopy_structs.hxx"
 #include "microscopy_funcs.hxx"
 
+Eigen::MatrixXd generate_convolution_matrix(int size) {
+	return Eigen::MatrixXd(size, size);
+}
+
 void convolve(Eigen::MatrixXd* mat, const Eigen::MatrixXd& kern) {
 	return; //do nothing, not implemented yet
 }
 
 extern bool g_abortthreads;
 
-std::vector<Eigen::MatrixXd> process_files(const std::vector<std::string>& filenames, int start, int end, HWND hProgressBar, HWND hDialog, const ifx::Experiment_Params& params) {
+std::vector<Eigen::MatrixXd> ifx::process_files(const std::vector<std::string>& filenames, int start, int end, HWND hProgressBar, HWND hDialog, const ifx::Experiment_Params& params) {
 	try {
 		const int num_layers = ifx::readbin(filenames[0], params.width, params.height).size();
 		std::vector<Eigen::MatrixXd> sums;
@@ -52,7 +56,7 @@ std::vector<Eigen::MatrixXd> process_files(const std::vector<std::string>& filen
 	}
 }
 
-void start_threads(const std::vector<std::string>& filenames, HWND hProgressBar, HWND hDialog, const ifx::Experiment_Params& params) {
+void ifx::start_threads(const std::vector<std::string>& filenames, HWND hProgressBar, HWND hDialog, const ifx::Experiment_Params& params) {
 	try {
 		auto num_threads = std::thread::hardware_concurrency();
 		if (num_threads == 0) num_threads = 1;
@@ -95,7 +99,7 @@ void start_threads(const std::vector<std::string>& filenames, HWND hProgressBar,
 	}
 }
 
-std::vector<std::string> get_sorted_filenames(const ifx::Experiment_Params& params) {
+std::vector<std::string> ifx::get_sorted_filenames(const ifx::Experiment_Params& params) {
 	std::vector<std::string> filenames = ifx::get_rawfile_filenames(params);
 	std::sort(filenames.begin(), filenames.end(), //natural sort technology (2 comes before 30)
 		[](std::string n1, std::string n2) {
