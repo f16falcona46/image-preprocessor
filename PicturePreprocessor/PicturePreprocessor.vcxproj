@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callbacks.hxx" />
+    <ClInclude Include="image_processing.hxx" />
     <ClInclude Include="imagefuncs.hxx" />
     <ClInclude Include="microscopy_funcs.hxx" />
     <ClInclude Include="microscopy_structs.hxx" />
@@ -33,6 +34,7 @@
     <ClCompile Include="imagefuncs.cpp" />
     <ClCompile Include="microscopy_funcs.cpp" />
     <ClCompile Include="picture_preprocessor.cpp" />
+    <ClCompile Include="image_processing.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{26BF80F0-8AE4-4C1C-A3F0-1406F1F6146B}</ProjectGuid>

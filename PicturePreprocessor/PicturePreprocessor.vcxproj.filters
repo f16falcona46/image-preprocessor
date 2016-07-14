@@ -30,6 +30,9 @@
     <ClInclude Include="microscopy_structs.hxx">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="image_processing.hxx">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources.rc">
@@ -47,6 +50,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="microscopy_funcs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image_processing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
