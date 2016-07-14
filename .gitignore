@@ -243,3 +243,13 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/PicturePreprocessor/RawFast
+/PicturePreprocessor/test9.png
+/PicturePreprocessor/test8.png
+/PicturePreprocessor/test7.png
+/PicturePreprocessor/test6.png
+/PicturePreprocessor/test5.png
+/PicturePreprocessor/test4.png
+/PicturePreprocessor/test3.png
+/PicturePreprocessor/test2.png
+/PicturePreprocessor/test1.png

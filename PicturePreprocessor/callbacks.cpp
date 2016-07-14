@@ -34,23 +34,38 @@ INT_PTR CALLBACK MainDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) 
 	return TRUE;
 }
 
-int process_files(const std::vector<std::string>& filenames, HWND hProgressBar, HWND hDialog) {
-	for (std::vector<std::string>::size_type i = 0; i < filenames.size(); ++i) {
-		std::cout << filenames[i] << std::endl;
+bool g_abortthreads;
+
+void process_files(const std::vector<std::string>& filenames, int start, int end, HWND hProgressBar, HWND hDialog) {
+	for (std::vector<std::string>::size_type i = start; i < end; ++i) {
 		std::vector<Eigen::MatrixXd> layers = ifx::readbin(filenames[i], 1024, 1024);
 		for (Eigen::MatrixXd& layer : layers) {
-			layer = layer/16383;
+			layer = layer / 16383;
 		}
-		ifx::write_image(layers, "test"+std::to_string(i+1)+".png");
+		ifx::write_image(layers, "test" + std::to_string(i + 1) + ".png");
+		if (g_abortthreads) return;
 		SendMessage(hProgressBar, PBM_STEPIT, 0, 0);
-		if (SendMessage(hProgressBar, PBM_GETPOS, 0, 0) == 50) {
-			EndDialog(hDialog, IDOK);
-		}
 	}
-	return 0;
+}
+
+void start_threads(const std::vector<std::string>& filenames, HWND hProgressBar, HWND hDialog) {
+	auto num_threads = std::thread::hardware_concurrency();
+	if (num_threads == 0) num_threads = 1;
+	const std::vector<std::string>::size_type files_per_thread = filenames.size()/num_threads;
+	std::vector<std::future<void>> threads;
+	for (int i = 0; i < num_threads - 1; ++i) {
+		threads.push_back(std::async(std::launch::async, process_files, filenames, files_per_thread*i, files_per_thread*(i+1), hProgressBar, hDialog));
+	}
+	threads.push_back(std::async(std::launch::async, process_files, filenames, files_per_thread*(num_threads - 1), filenames.size(), hProgressBar, hDialog));
+
+	for (std::future<void>& thread : threads) {
+		thread.get();
+	}
+	EndDialog(hDialog, IDOK);
 }
 
 static HWND g_hProgressBar = NULL;
+static std::future<void> handle;
 //callback for the progress bar dialog
 INT_PTR CALLBACK ProgressDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
@@ -81,9 +96,9 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 			ShowWindow(g_hProgressBar, SW_SHOW);
 			SendMessage(g_hProgressBar, PBM_SETRANGE, 0, (LPARAM)(MAKELONG(0,filenames.size())));
 			SendMessage(g_hProgressBar, PBM_SETSTEP, (WPARAM)1, 0);
-			//SetTimer(hwnd, ID_TIMER_PROGRESSBAR, 200, NULL);
 			
-			std::future<int> handle = std::async(process_files, filenames, g_hProgressBar, hwnd);
+			g_abortthreads = false;
+			handle = std::async(std::launch::async, start_threads, filenames, g_hProgressBar, hwnd);
 		}
 		break;
 		case WM_COMMAND:
@@ -96,17 +111,8 @@ INT_PTR CALLBACK ProgressDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 				break;
 			}
 		break;
-		case WM_TIMER:
-		switch (LOWORD(wParam)) {
-			case ID_TIMER_PROGRESSBAR:
-				SendMessage(g_hProgressBar, PBM_STEPIT, 0, 0);
-				if (SendMessage(g_hProgressBar, PBM_GETPOS, 0, 0) == 50) {
-					KillTimer(hwnd, ID_TIMER_PROGRESSBAR);
-					EndDialog(hwnd, IDOK);
-				}
-			break;
-			default: return FALSE;
-		}
+		case WM_DESTROY:
+			g_abortthreads = true;
 		break;
 		default:
 		return FALSE;
