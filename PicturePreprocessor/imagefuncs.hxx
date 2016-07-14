@@ -15,7 +15,7 @@ std::vector<Eigen::MatrixXd> readbin(const std::string& filename, int width, int
 
 template <typename MatrixType>
 void write_image(const std::vector<MatrixType>& layers, const std::string& filename) {
-	std::unique_ptr<std::FILE, std::function<void(std::FILE*)>> file (std::fopen(filename.c_str(), "wb"), [](FILE* f) {fclose(f);});
+	std::unique_ptr<std::FILE, int(*)(std::FILE*)> file (std::fopen(filename.c_str(), "wb"), std::fclose);
 	std::unique_ptr<png_struct, std::function<void(png_struct*)>> png_ptr (png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr), [](png_structp p) {png_destroy_write_struct(&p, nullptr);});
 	std::unique_ptr<png_info, std::function<void(png_info*)>> info_ptr (png_create_info_struct(png_ptr.get()), [&png_ptr](png_infop p){png_free_data(png_ptr.get(), p, PNG_FREE_ALL, -1);});
 	std::vector<png_byte> row (layers[0].rows()*3);

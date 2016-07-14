@@ -20,5 +20,6 @@ std::vector<Eigen::MatrixXd> ifx::readbin(const std::string& filename, int width
 			layers[1](x,y) = (double)(buf[y*width+x + width*height]);
 		}
 	}
+	fclose(f);
 	return layers;
 }

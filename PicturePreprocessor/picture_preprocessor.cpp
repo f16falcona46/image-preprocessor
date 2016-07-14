@@ -152,7 +152,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, char* lpCmdLine,
 	
 	ifx::Experiment_Params params;
 	params.calibrationdate = "20130125"; //default calibration date
-	ifx::read_experiment_params("Experiment Parameters.txt", &params);
+	ifx::read_experiment_params(&params);
 	std::cout << params << std::endl;
 	
 	INT_PTR ret = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_SELECTDIRECTORY), NULL, MainDlgProc);
